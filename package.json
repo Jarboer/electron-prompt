@@ -1,5 +1,5 @@
 {
-  "name": "electron-prompt",
+  "name": "@Jarboer/electron-prompt",
   "version": "0.0.0-dev",
   "description": "Electron helper to prompt for a value via input or select",
   "keywords": [
