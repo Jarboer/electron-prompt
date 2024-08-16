@@ -1,6 +1,6 @@
 {
   "name": "@jarboer/electron-prompt",
-  "version": "1.10.1",
+  "version": "1.10.2",
   "description": "Electron helper to prompt for a value via input or select",
   "keywords": [
     "electron",
@@ -23,7 +23,8 @@
     "lint:fix": "xo --fix",
     "test": "pnpm lint",
     "tailwind": "pnpx tailwindcss -i ./lib/page/prompt-in.css -o ./lib/page/prompt-out.css",
-    "tailwind:watch": "pnpx tailwindcss -i ./lib/page/prompt-in.css -o ./lib/page/prompt-out.css --watch"
+    "tailwind:watch": "pnpx tailwindcss -i ./lib/page/prompt-in.css -o ./lib/page/prompt-out.css --watch",
+    "webpack": "pnpx webpack-cli --config webpack.config.js"
   },
   "xo": {
     "esnext": true,
@@ -37,7 +38,15 @@
     }
   },
   "devDependencies": {
+    "@electron/remote": "^2.1.2",
+    "clean-webpack-plugin": "^4.0.0",
+    "copy-webpack-plugin": "^12.0.2",
+    "electron": "^31.4.0",
+    "html-webpack-plugin": "^5.6.0",
     "tailwindcss": "^3.4.10",
+    "webpack": "^5.93.0",
+    "webpack-cli": "^5.1.4",
+    "webpack-node-externals": "^3.0.0",
     "xo": "^0.44.0"
   }
 }

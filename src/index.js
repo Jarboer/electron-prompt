@@ -1,14 +1,5 @@
-/******/ (() => { // webpackBootstrap
-/******/ 	var __webpack_modules__ = ({
-
-/***/ "./src/index.js":
-/*!**********************!*\
-  !*** ./src/index.js ***!
-  \**********************/
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
-
-const path = __webpack_require__(/*! path */ "path");
-const electron = __webpack_require__(/*! electron */ "electron");
+const path = require('path');
+const electron = require('electron');
 
 /**
  * The default width of the prompt window.
@@ -37,7 +28,7 @@ function getElectronMainExport(id) {
 	let remote = electron.remote;
 	if (!remote) {
 		try {
-			remote = __webpack_require__(/*! @electron/remote */ "@electron/remote");
+			remote = require('@electron/remote');
 		} catch (originalError) {
 			const error = new Error(
 				'Install and set-up package `@electron/remote` to use this module from a renderer process.\n'
@@ -234,76 +225,3 @@ function electronPrompt(options, parentWindow) {
 }
 
 module.exports = electronPrompt;
-
-
-/***/ }),
-
-/***/ "@electron/remote":
-/*!***********************************!*\
-  !*** external "@electron/remote" ***!
-  \***********************************/
-/***/ ((module) => {
-
-"use strict";
-module.exports = require("@electron/remote");
-
-/***/ }),
-
-/***/ "electron":
-/*!***************************!*\
-  !*** external "electron" ***!
-  \***************************/
-/***/ ((module) => {
-
-"use strict";
-module.exports = require("electron");
-
-/***/ }),
-
-/***/ "path":
-/*!***********************!*\
-  !*** external "path" ***!
-  \***********************/
-/***/ ((module) => {
-
-"use strict";
-module.exports = require("path");
-
-/***/ })
-
-/******/ 	});
-/************************************************************************/
-/******/ 	// The module cache
-/******/ 	var __webpack_module_cache__ = {};
-/******/ 	
-/******/ 	// The require function
-/******/ 	function __webpack_require__(moduleId) {
-/******/ 		// Check if module is in cache
-/******/ 		var cachedModule = __webpack_module_cache__[moduleId];
-/******/ 		if (cachedModule !== undefined) {
-/******/ 			return cachedModule.exports;
-/******/ 		}
-/******/ 		// Create a new module (and put it into the cache)
-/******/ 		var module = __webpack_module_cache__[moduleId] = {
-/******/ 			// no module.id needed
-/******/ 			// no module.loaded needed
-/******/ 			exports: {}
-/******/ 		};
-/******/ 	
-/******/ 		// Execute the module function
-/******/ 		__webpack_modules__[moduleId](module, module.exports, __webpack_require__);
-/******/ 	
-/******/ 		// Return the exports of the module
-/******/ 		return module.exports;
-/******/ 	}
-/******/ 	
-/************************************************************************/
-/******/ 	
-/******/ 	// startup
-/******/ 	// Load entry module and return exports
-/******/ 	// This entry module is referenced by other modules so it can't be inlined
-/******/ 	var __webpack_exports__ = __webpack_require__("./src/index.js");
-/******/ 	
-/******/ })()
-;
-//# sourceMappingURL=index.js.map

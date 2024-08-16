@@ -1,0 +1,20 @@
+<!-- Default font colour -->
+<html class="text-gray-700 dark:text-white">
+    <head>
+        <meta charset="UTF-8" />
+        <link href="prompt-out.css" rel="stylesheet" />
+    </head>
+    <body>
+        <div id="container" class="mx-auto flex flex-col items-center justify-center px-6 py-8 h-screen bg-white dark:bg-gray-900">
+            <form id="form" class="w-full pt-2 space-y-4 md:space-y-6">
+                <h1 id="label" class="text-lg font-bold leading-tight tracking-tight">...</h1>
+                <div id="data-container" class="text-center"></div>
+                <div class="flex justify-end gap-2">                    
+                    <button id="cancel" class="w-24 rounded-lg bg-gray-200 dark:bg-gray-600 px-5 py-2.5 text-center text-sm font-medium text-black dark:text-white hover:bg-gray-300 dark:hover:bg-gray-500 focus:outline-none focus:ring-4 focus:ring-primary-300 active:bg-gray-400 dark:active:bg-gray-400 dark:focus:ring-primary-500">Cancel</button>
+                    <button type="submit" id="ok" class="w-24 rounded-lg bg-primary-600 px-5 py-2.5 text-center text-sm font-medium text-white hover:bg-primary-700 focus:outline-none focus:ring-4 focus:ring-primary-300 active:bg-primary-800 dark:focus:ring-primary-500">Ok</button>
+                </div>
+            </form>
+        </div>
+        <script src="prompt.js"></script>
+    </body>
+</html>
