@@ -1,6 +1,6 @@
 {
   "name": "@jarboer/electron-prompt",
-  "version": "1.8.0",
+  "version": "1.9.0",
   "description": "Electron helper to prompt for a value via input or select",
   "keywords": [
     "electron",
@@ -21,7 +21,9 @@
   "scripts": {
     "lint": "xo",
     "lint:fix": "xo --fix",
-    "test": "npm run lint"
+    "test": "pnpm lint",
+    "tailwind": "pnpx tailwindcss -i ./lib/page/prompt-in.css -o ./lib/page/prompt-out.css",
+    "tailwind:watch": "pnpx tailwindcss -i ./lib/page/prompt-in.css -o ./lib/page/prompt-out.css --watch"
   },
   "xo": {
     "esnext": true,
@@ -35,6 +37,7 @@
     }
   },
   "devDependencies": {
+    "tailwindcss": "^3.4.10",
     "xo": "^0.44.0"
   }
 }

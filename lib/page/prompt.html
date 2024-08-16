@@ -1,15 +1,16 @@
-<html>
+<!-- Default font colour -->
+<html class="text-gray-700 dark:text-white">
     <head>
-        <link href="prompt.css" rel="stylesheet" />
+        <link href="prompt-out.css" rel="stylesheet" />
     </head>
-    <body>
-        <div id="container">
-            <form id="form">
-                <div id="label">...</div>
-                <div id="data-container"></div>
-                <div id="buttons">
-                    <button id="cancel">Cancel</button>
-                    <button type="submit" id="ok">OK</button>
+    <body class="mx-2">
+        <div id="container" class="items-center justify-center flex h-full overflow-auto">
+            <form id="form" class="w-full pt-2">
+                <div id="label" class="max-w-full max-h-full mb-3 mx-2 whitespace-nowrap overflow-hidden text-ellipsis">...</div>
+                <div id="data-container" class="text-center"></div>
+                <div id="buttons" class="text-right px-2">
+                    <button id="cancel" class="text-black bg-gray-300 rounded-sm border-0 m-0 ml-2 text-xs px-4 py-2">Cancel</button>
+                    <button type="submit" id="ok" class="text-white bg-primary-500 rounded-sm border-0 m-0 ml-2 text-xs px-4 py-2">Ok</button>
                 </div>
             </form>
         </div>
