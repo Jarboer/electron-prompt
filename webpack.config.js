@@ -63,6 +63,7 @@ module.exports = [
             globOptions: {
               ignore: [
                 '**/prompt-in.css',
+                '**/prompt.ts'
               ],
             },
           },

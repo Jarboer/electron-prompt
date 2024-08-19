@@ -1,5 +1,5 @@
 import fs from 'fs';
-import ipcRenderer from 'electron';
+import { ipcRenderer } from 'electron';
 
 import { ElectronPromptOptions } from '../electron-prompt';
 
@@ -7,11 +7,6 @@ import { ElectronPromptOptions } from '../electron-prompt';
  * The ID of the current prompt, extracted from the URL hash.
  */
 let promptId: string | null = null;
-
-/**
- * The options for configuring the prompt, retrieved from the main process.
- */
-let promptOptions: ElectronPromptOptions | null = null;
 
 /**
  * Sends an error message back to the main process.
@@ -36,16 +31,12 @@ function promptCancel() {
 /**
  * Submits the data from the prompt input to the main process.
  */
-function promptSubmit() {
+function promptSubmit(promptOptions: ElectronPromptOptions) {
 	const dataElement = document.querySelector('#data') as HTMLElement | null;
 	let data: string | (string | null)[] | null = null; // TODO: Simplify
 
 	if (dataElement === null) {
 		return promptError("Error: Unable to find the #data element!");
-	} else if (promptOptions === null) {
-		return promptError("Error: promptOptions is null!");
-	} else if (promptOptions.type === undefined) {
-		return promptError("Error: promptOptions.type is undefined!");
 	}
 
 	if (promptOptions.type === 'input') {
@@ -76,17 +67,12 @@ function promptSubmit() {
  *
  * @returns {HTMLInputElement} The created input element.
  */
-function promptCreateInput() {
+function promptCreateInput(promptOptions: ElectronPromptOptions) {
 	const dataElement = document.createElement('input');
 	dataElement.setAttribute('type', 'text');
 
-	if (promptOptions === null) {
-		return promptError("Error: promptOptions is null!");
-	}
-
 	// Set input's value if provided, otherwise, set it to a blank string
 	dataElement.value = promptOptions.value ?? '';
-
 
 	// Set input's placeholder if provided, otherwise, set it to a blank string
 	dataElement.placeholder = promptOptions.placeholder ?? '';
@@ -128,12 +114,8 @@ function promptCreateInput() {
  *
  * @returns {HTMLSelectElement} The created select element.
  */
-function promptCreateSelect() {
+function promptCreateSelect(promptOptions: ElectronPromptOptions) {
 	const dataElement = document.createElement('select');
-
-	if (promptOptions === null) {
-		return promptError("Error: promptOptions is null!");
-	}
 
 	// Populate the select element with options
 	for (const [key, text] of Object.entries(promptOptions.selectOptions ?? {})) {
@@ -162,15 +144,13 @@ function promptRegister() {
 	// Extract the prompt ID from the URL hash
 	promptId = document.location.hash.replace('#', '');
 
+	let promptOptions: ElectronPromptOptions;
+
 	try {
 		// Retrieve prompt options from the main process
 		promptOptions = JSON.parse(ipcRenderer.sendSync('prompt-get-options:' + promptId));
 	} catch (error) {
-		return promptError(error);
-	}
-
-	if (promptOptions === null) {
-		return promptError("Error: promptOptions is null!");
+		return promptError((error as any));
 	}
 
 	const label = document.querySelector('#label');
@@ -215,7 +195,7 @@ function promptRegister() {
 			}
 		}
 	} catch (error) {
-		return promptError(error);
+		return promptError((error as any));
 	}
 
 	// Attach event listeners to the cancel button
@@ -226,16 +206,18 @@ function promptRegister() {
 	// Attach event listeners to the form button
 	const formBtn = document.querySelector('#form');
 	if (formBtn) {
-		formBtn.addEventListener('submit', promptSubmit);
+		formBtn.addEventListener('submit', () => {
+			promptSubmit(promptOptions);
+		});
 	}
 
 	
 	// Create and append the appropriate input element based on the prompt type
 	let dataElement;
 	if (promptOptions.type === 'input') {
-		dataElement = promptCreateInput();
+		dataElement = promptCreateInput(promptOptions);
 	} else if (promptOptions.type === 'select') {
-		dataElement = promptCreateSelect();
+		dataElement = promptCreateSelect(promptOptions);
 	} else {
 		return promptError(`Unhandled input type '${promptOptions.type}'`);
 	}
