@@ -18,7 +18,7 @@ module.exports = [
     },
     entry: {
       'electron-prompt': { import: './src/electron-prompt.ts', filename: './[name].js' },
-      // prompt: { import: './src/page/prompt.js', filename: './page/[name].js' },
+      prompt: { import: './src/page/prompt.ts', filename: './page/[name].js' },
     },
     output: {
       path: path.resolve(__dirname, 'lib'),

@@ -22,6 +22,11 @@ const DEFAULT_HEIGHT = 180;
 export type InputElement = 'button' | 'checkbox' | 'color' | 'date' | 'datetime-local' | 'email' | 'file' | 'hidden' | 'image' | 'month' | 'number' |
     'password' | 'radio' | 'range' | 'reset' | 'search' | 'submit' | 'tel' | 'text' | 'time' | 'url' | 'week';
 
+interface ButtonLabels  {
+	ok?: string;
+	cancel?: string;
+}
+
 /**
  * Used to define the prompt's information object
  */
@@ -41,7 +46,7 @@ export interface ElectronPromptOptions {
 	/**
 	 * The text for the OK/cancel buttons. Properties are 'ok' and 'cancel'. Defaults to null.
 	 */
-	buttonLabels?: object;
+	buttonLabels?: ButtonLabels | null;
 	/**
 	 * The default value for the input field. Defaults to null.
 	 */
@@ -63,6 +68,8 @@ export interface ElectronPromptOptions {
 	 * to the then block and the display text is what the user will see.
 	 */
 	selectOptions?: object;
+	// TODO: Comment on
+	selectMultiple?: boolean;
 	/**
 	 * Whether the label should be interpreted as HTML or not. Defaults to false.
 	 */

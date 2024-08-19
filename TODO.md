@@ -10,3 +10,4 @@ Make sure webpack isn't bundling npm packages (see: https://webpack.js.org/guide
 Improve webpack by following [this](https://webpack.js.org/guides/typescript/)?
 ~~Change electron.BrowserWindow to BrowserWindow~~
 Do I need getElectronMainExport()? - Can I import directly?
+Do I need to set stuff as null if it is already undefined?
