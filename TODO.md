@@ -12,3 +12,5 @@ Improve webpack by following [this](https://webpack.js.org/guides/typescript/)?
 Do I need getElectronMainExport()? - Can I import directly?
 Do I need to set stuff as null if it is already undefined?
 Define ipcRenderer the same way as I do in preload.d.ts in other projects?
+Add window center from this fork? - https://github.com/p-sam/electron-prompt/compare/develop...noahheck:electron-prompt:develop
+Add credit back for dev

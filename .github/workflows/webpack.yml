@@ -15,19 +15,23 @@ jobs:
         node-version: [18.x, 20.x, 22.x]
 
     steps:
-    - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
 
-    - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v4
-      with:
-        node-version: ${{ matrix.node-version }}
-        cache: 'pnpm' # Caches the pnpm store between builds
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          # version: 9
+          run_install: false
 
-    - name: Install pnpm
-      run: npm install -g pnpm
+      - name: Install Node.js
+        uses: actions/setup-node@v4
+        with:
+          # node-version: 20
+          cache: 'pnpm'
 
-    - name: Install Dependencies
-      run: pnpm install
+      - name: Install dependencies
+        run: pnpm install
 
-    - name: Build
-      run: pnpx webpack
+      - name: Build
+        run: pnpm webpack
