@@ -67,7 +67,7 @@ module.exports = [
             },
           },
           { from: './types/**/*', to: '[path][name][ext]', context: 'src' }, // Copy all files in types
-          { from: './electron-prompt.d.ts', to: '[path][name][ext]', context: 'src' }, // Copy all files in types
+          // { from: './electron-prompt-type.d.ts', to: '[path][name][ext]', context: 'src' }, // Copy all files in types
         ],
       }),
       new CleanWebpackPlugin({
