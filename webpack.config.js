@@ -17,25 +17,30 @@ module.exports = [
       node: true, // in order to ignore built-in modules like path, fs, etc.
     },
     entry: {
-    //   index: { import: './src/index.js', filename: './[name].js' },
-    //   prompt: { import: './src/page/prompt.js', filename: './page/[name].js' },
+      'electron-prompt': { import: './src/electron-prompt.ts', filename: './[name].js' },
+      // prompt: { import: './src/page/prompt.js', filename: './page/[name].js' },
     },
     output: {
       path: path.resolve(__dirname, 'lib'),
       // pathinfo: true, // For debugging
+      globalObject: 'this',
+      library: {
+        name: 'electronPrompt',
+        type: 'umd',
+      },
     },
-    // resolve: {
-    //   extensions: ['.ts', '.js'],
-    // },
-    // module: {
-    //   rules: [
-    //     {
-    //       test: /\.ts$/,
-    //       use: 'ts-loader',
-    //       exclude: /node_modules/,
-    //     },
-    //   ],
-    // },
+    resolve: {
+      extensions: ['.ts', '.js'],
+    },
+    module: {
+      rules: [
+        {
+          test: /\.ts$/,
+          use: 'ts-loader',
+          exclude: /node_modules/,
+        },
+      ],
+    },
     plugins: [
       // new HtmlWebpackPlugin({
       //   template: 'src/page/prompt.html',
@@ -50,7 +55,19 @@ module.exports = [
       // }),
       new CopyWebpackPlugin({
         patterns: [
-          { from: './**/*', to: '[path][name][ext]', context: 'src' }, // Copy all files
+          // Copy all files in page
+          {
+            from: './page/**/*',
+            to: '[path][name][ext]',
+            context: 'src',
+            globOptions: {
+              ignore: [
+                '**/prompt-in.css',
+              ],
+            },
+          },
+          { from: './types/**/*', to: '[path][name][ext]', context: 'src' }, // Copy all files in types
+          { from: './electron-prompt.d.ts', to: '[path][name][ext]', context: 'src' }, // Copy all files in types
         ],
       }),
       new CleanWebpackPlugin({

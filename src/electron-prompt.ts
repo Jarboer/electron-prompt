@@ -1,5 +1,5 @@
-const path = require('path');
-const electron = require('electron');
+import path from 'path';
+import electron from 'electron';
 
 /**
  * The default width of the prompt window.
@@ -16,35 +16,35 @@ const DEFAULT_HEIGHT = 180;
 /**
  * Retrieves an export from the Electron main process, either directly or via `@electron/remote` for use in the renderer process.
  *
- * @param {string} id - The identifier of the Electron export to retrieve.
- * @returns {*} The requested Electron export.
- * @throws {Error} If the requested export is not available or if `@electron/remote` is not set up correctly.
+ * @param id - The identifier of the Electron export to retrieve.
+ * @returns The requested Electron export.
+ * @throws If the requested export is not available or if `@electron/remote` is not set up correctly.
  */
-function getElectronMainExport(id) {
+function getElectronMainExport(id: keyof typeof electron): any {
 	if (electron[id]) {
 		return electron[id];
 	}
 
-	let remote = electron.remote;
+	let remote = (electron as any).remote; // TODO: Fix using defined typing
 	if (!remote) {
 		try {
 			remote = require('@electron/remote');
 		} catch (originalError) {
 			const error = new Error(
-				'Install and set-up package `@electron/remote` to use this module from a renderer process.\n'
-				+ 'It is preferable to set up message exchanges for this using `ipcMain.handle()` and `ipcRenderer.invoke()`,\n'
-				+ 'avoiding remote IPC overhead costs, and one more package dependency.\n\n'
-				+ 'Original error message:\n\n'
-				+ originalError.message,
+				'Install and set-up package `@electron/remote` to use this module from a renderer process.\n' +
+					'It is preferable to set up message exchanges for this using `ipcMain.handle()` and `ipcRenderer.invoke()`,\n' +
+					'avoiding remote IPC overhead costs, and one more package dependency.\n\n' +
+					'Original error message:\n\n' +
+					(originalError as Error).message, // TODO: Change when the above is fixed
 			);
 
-			error.originalError = originalError;
+			(error as any).originalError = originalError;
 			throw error;
 		}
 	}
 
-	if (remote && remote[id]) {
-		return remote[id];
+	if (remote && id in remote) {
+		return remote[id as keyof typeof remote];
 	}
 
 	throw new Error('Unknown electron export: ' + String(id));
@@ -65,11 +65,11 @@ const ipcMain = getElectronMainExport('ipcMain');
 /**
  * Displays a prompt window with various customization options.
  *
- * @param {Object} options - Configuration options for the prompt window.
- * @param {Electron.BrowserWindow} [parentWindow] - The parent window to which the prompt window will be modal.
- * @returns {Promise<string|null>} Resolves with the value entered by the user or null if the window is closed.
+ * @param options - Configuration options for the prompt window.
+ * @param parentWindow - The parent window to which the prompt window will be modal.
+ * @returns Resolves with the value entered by the user or null if the window is closed.
  */
-function electronPrompt(options, parentWindow) {
+function electronPrompt(options: Object, parentWindow: electron.BrowserWindow | undefined): Promise<string|null> {
 	return new Promise((resolve, reject) => {
 		const id = `${Date.now()}-${Math.random()}`;
 
@@ -111,7 +111,6 @@ function electronPrompt(options, parentWindow) {
 			return;
 		}
 
-		/** @type {Electron.BrowserWindow|null} */
 		let promptWindow = new BrowserWindow({
 			width: options_.width,
 			height: options_.height,
@@ -143,9 +142,9 @@ function electronPrompt(options, parentWindow) {
 
 		/**
 		 * Sends the prompt options to the renderer process when requested.
-		 * @param {Electron.IpcMainEvent} event - The IPC event.
+		 * @param event - The IPC event.
 		 */
-		const getOptionsListener = event => {
+		const getOptionsListener = (event: Electron.IpcMainEvent) => {
 			event.returnValue = JSON.stringify(options_);
 		};
 
@@ -165,10 +164,10 @@ function electronPrompt(options, parentWindow) {
 
 		/**
 		 * Handles the data sent from the prompt and resolves the promise with the entered value.
-		 * @param {Electron.IpcMainEvent} event - The IPC event.
-		 * @param {string} value - The value entered by the user.
+		 * @param event - The IPC event.
+		 * @param value - The value entered by the user.
 		 */
-		const postDataListener = (event, value) => {
+		const postDataListener = (event: electron.IpcMainEvent, value: string) => {
 			resolve(value);
 			event.returnValue = null;
 			cleanup();
@@ -184,10 +183,10 @@ function electronPrompt(options, parentWindow) {
 
 		/**
 		 * Handles errors from the prompt window and rejects the promise with the error message.
-		 * @param {Electron.IpcMainEvent} event - The IPC event.
-		 * @param {string} message - The error message.
+		 * @param event - The IPC event.
+		 * @param message - The error message.
 		 */
-		const errorListener = (event, message) => {
+		const errorListener = (event: electron.IpcMainEvent, message: string) => {
 			reject(new Error(message));
 			event.returnValue = null;
 			cleanup();
@@ -224,4 +223,4 @@ function electronPrompt(options, parentWindow) {
 	});
 }
 
-module.exports = electronPrompt;
+export default electronPrompt;
