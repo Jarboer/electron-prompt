@@ -18,7 +18,7 @@ module.exports = [
     },
     entry: {
       'electron-prompt': { import: './src/electron-prompt.ts', filename: './[name].js' },
-      prompt: { import: './src/page/prompt.ts', filename: './page/[name].js' },
+      prompt: { import: './src/prompt/prompt.ts', filename: './prompt/[name].js' },
     },
     output: {
       path: path.resolve(__dirname, 'lib'),
@@ -43,27 +43,37 @@ module.exports = [
     },
     plugins: [
       // new HtmlWebpackPlugin({
-      //   template: 'src/page/prompt.html',
+      //   template: 'src/prompt/prompt.html',
       //   chunks: ['prompt'],
-      //   filename: './page/prompt.html',
+      //   filename: './prompt/prompt.html',
       //   inject: false, // Disable automatic injection
       // }),
       // new CopyWebpackPlugin({
       //   patterns: [
-      //     { from: 'src/page/prompt-out.css', to: './page' },
+      //     { from: 'src/prompt/prompt-out.css', to: './prompt' },
       //   ],
       // }),
       new CopyWebpackPlugin({
         patterns: [
-          // Copy all files in page
+          // Copy all files in prompt
           {
-            from: './page/**/*',
+            from: './prompt/**/*',
             to: '[path][name][ext]',
             context: 'src',
             globOptions: {
               ignore: [
-                '**/prompt-in.css',
-                '**/prompt.ts'
+                '**/*.ts'
+              ],
+            },
+          },
+          // Copy all files in login-prompt
+          {
+            from: './login-prompt/**/*',
+            to: '[path][name][ext]',
+            context: 'src',
+            globOptions: {
+              ignore: [
+                '**/*.ts'
               ],
             },
           },

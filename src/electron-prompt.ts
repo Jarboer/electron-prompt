@@ -337,12 +337,12 @@ export function electronPrompt(options: ElectronPromptOptions, parentWindow?: Br
 			});
 		}
 
-		const devPath = "C:\\Users\\jboersen\\Developer\\Node.js\\electron-prompt\\lib\\page\\prompt.html";
+		const devPath = "C:\\Users\\jboersen\\Developer\\Node.js\\electron-prompt\\lib\\prompt\\prompt.html";
 
 		// Load the HTML file for the prompt window
 		promptWindow.loadFile(
 			devPath, // TODO: Change back later
-			// path.join(__dirname, 'page', 'prompt.html'),
+			// path.join(__dirname, 'prompt', 'prompt.html'),
 			{hash: id},
 		);
 	});
