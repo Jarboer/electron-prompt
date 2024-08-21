@@ -2,8 +2,8 @@ import fs from 'fs';
 import { ipcRenderer } from 'electron';
 
 import { ElectronPromptOptions } from '../electron-prompt';
-import { promptSubmit } from '../prompt/prompt';
-import { loginPromptSubmit } from '../login-prompt/login-prompt';
+import { promptSubmit } from './prompt/prompt';
+import { loginPromptSubmit } from './login-prompt/login-prompt';
 
 /**
  * Registers the prompt window and initializes it based on the retrieved options.

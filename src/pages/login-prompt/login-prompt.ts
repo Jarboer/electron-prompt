@@ -4,8 +4,8 @@
 
 import { ipcRenderer } from 'electron';
 
-import { ElectronPromptOptions } from '../electron-prompt';
-import { promptError, promptCancel, promptRegister } from '../helpers/prompt.helper';
+import { ElectronPromptOptions } from '../../electron-prompt';
+import { promptError, promptCancel, promptRegister } from '../prompt.controller';
 
 /**
  * The ID of the current prompt, extracted from the URL hash.

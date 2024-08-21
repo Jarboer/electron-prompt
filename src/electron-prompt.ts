@@ -34,10 +34,12 @@ export interface ElectronPromptOptions {
 	/**
 	 * The title of the prompt window. Defaults to 'Prompt'.
 	 */
+	// TODO: It will say something different for login
 	title?: string;
 	/**
 	 * The label which appears on the prompt for the input field. Defaults to 'Please input a value:'.
 	 */
+	// TODO: It will say something different for login
 	label?: string;
 	/**
 	 * The placeholder which appears on the prompt for the input field. Defaults to blank.
@@ -200,6 +202,8 @@ export function electronPrompt(options: ElectronPromptOptions, parentWindow?: Br
 		const id = `${Date.now()}-${Math.random()}`;
 
 		// BrowserWindowConstructorOptions is the type for the BrowserWindow options
+
+		// TODO: Customize for login
 
 		// Merge user-provided options with defaults
 		const options_ = Object.assign(
