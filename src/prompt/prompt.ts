@@ -2,31 +2,12 @@ import fs from 'fs';
 import { ipcRenderer } from 'electron';
 
 import { ElectronPromptOptions } from '../electron-prompt';
+import { promptError, promptCancel } from '../helpers/prompt.helper';
 
 /**
  * The ID of the current prompt, extracted from the URL hash.
  */
 let promptId: string | null = null;
-
-/**
- * Sends an error message back to the main process.
- *
- * @param error - The error object or message to send.
- */
-function promptError(error: Error | string) {
-	if (error instanceof Error) {
-		error = error.message;
-	}
-
-	ipcRenderer.sendSync('prompt-error:' + promptId, error);
-}
-
-/**
- * Cancels the prompt and sends a null response back to the main process.
- */
-function promptCancel() {
-	ipcRenderer.sendSync('prompt-post-data:' + promptId, null);
-}
 
 /**
  * Submits the data from the prompt input to the main process.
@@ -36,7 +17,7 @@ function promptSubmit(promptOptions: ElectronPromptOptions) {
 	let data: string | (string | null)[] | null = null; // TODO: Simplify
 
 	if (dataElement === null) {
-		return promptError("Error: Unable to find the #data element!");
+		return promptError("Error: Unable to find the #data element!", promptId);
 	}
 
 	if (promptOptions.type === 'input') {
@@ -93,7 +74,7 @@ function promptCreateInput(promptOptions: ElectronPromptOptions) {
 	// Add event listeners for cancel and submit actions
 	dataElement.addEventListener('keyup', event => {
 		if (event.key === 'Escape') {
-			promptCancel();
+			promptCancel(promptId);
 		}
 	});
 
@@ -150,7 +131,7 @@ function promptRegister() {
 		// Retrieve prompt options from the main process
 		promptOptions = JSON.parse(ipcRenderer.sendSync('prompt-get-options:' + promptId));
 	} catch (error) {
-		return promptError((error as any));
+		return promptError((error as any), promptId);
 	}
 
 	const label = document.querySelector('#label');
@@ -195,18 +176,20 @@ function promptRegister() {
 			}
 		}
 	} catch (error) {
-		return promptError((error as any));
+		return promptError((error as any), promptId);
 	}
 
 	// Attach event listeners to the cancel button
 	const cancelBtn = document.querySelector('#cancel');
 	if (cancelBtn) {
-		cancelBtn.addEventListener('click', promptCancel);
+		cancelBtn.addEventListener('click', () => {
+			promptCancel(promptId);
+		});
 	}
-	// Attach event listeners to the form button
-	const formBtn = document.querySelector('#form');
-	if (formBtn) {
-		formBtn.addEventListener('submit', () => {
+	// Attach event listeners to the form
+	const form = document.querySelector('#form');
+	if (form) {
+		form.addEventListener('submit', () => {
 			promptSubmit(promptOptions);
 		});
 	}
@@ -219,7 +202,7 @@ function promptRegister() {
 	} else if (promptOptions.type === 'select') {
 		dataElement = promptCreateSelect(promptOptions);
 	} else {
-		return promptError(`Unhandled input type '${promptOptions.type}'`);
+		return promptError(`Unhandled input type '${promptOptions.type}'`, promptId);
 	}
 	
 	const dataContainerElement = document.querySelector('#data-container') as HTMLDivElement | null;
@@ -245,7 +228,7 @@ function promptRegister() {
  */
 window.addEventListener('error', error => {
 	if (promptId) {
-		promptError('An error has occurred on the prompt window: \n' + error.message);
+		promptError('An error has occurred on the prompt window: \n' + error.message, promptId);
 	}
 });
 

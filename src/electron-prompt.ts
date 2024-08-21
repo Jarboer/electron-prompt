@@ -54,7 +54,8 @@ export interface ElectronPromptOptions {
 	/**
 	 *  The type of input field, either 'input' for a standard text input field or 'select' for a dropdown type input. Defaults to 'input'.
 	 */
-	type?: "input" | "select";
+	// TODO: Add mention about login
+	type?: "input" | "select" | "login";
 	/**
 	 * The attributes of the input field, analogous to the HTML attributes: `{type: 'text', required: true}` -> `<input type="text" required>`.
 	 * Used if the type is 'input'
@@ -337,7 +338,13 @@ export function electronPrompt(options: ElectronPromptOptions, parentWindow?: Br
 			});
 		}
 
-		const devPath = "C:\\Users\\jboersen\\Developer\\Node.js\\electron-prompt\\lib\\prompt\\prompt.html";
+		let devPath: string;
+
+		if (options_.type === "login") {
+			devPath = "C:\\Users\\jboersen\\Developer\\Node.js\\electron-prompt\\lib\\login-prompt\\login-prompt.html";
+		} else {
+			devPath = "C:\\Users\\jboersen\\Developer\\Node.js\\electron-prompt\\lib\\prompt\\prompt.html";
+		}
 
 		// Load the HTML file for the prompt window
 		promptWindow.loadFile(

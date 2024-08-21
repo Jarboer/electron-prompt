@@ -3,10 +3,10 @@
 	"tasks": [
 		{
 			"type": "npm",
-			"script": "webpack",
+			"script": "build",
 			"group": "build",
 			"problemMatcher": [],
-			"label": "pnpm: webpack",
+			"label": "pnpm: build",
 			"detail": "Packs/builds the library using webpack"
 		}
 	]

@@ -5,7 +5,12 @@
     <meta charset="UTF-8" />
     <title>Save your Plex Credentials</title>
     <!-- https://electronjs.org/docs/tutorial/security#csp-meta-tag -->
-    <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline';" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline';"
+    />
+    <!-- FIXME: Switch to a safer value when not debugging (also change to production in webpack) -->
+    <!-- <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline';" /> -->
     <link rel="stylesheet" href="../tailwind-out.css" />
 
     <script src="login-prompt.js"></script>
@@ -53,6 +58,7 @@
               </div>
               <button
                 type="submit"
+                id="save-btn"
                 class="w-full rounded-lg bg-primary-600 px-5 py-2.5 text-center text-sm font-medium text-white hover:bg-primary-700 focus:outline-none focus:ring-4 focus:ring-primary-300 active:bg-primary-800 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-500 dark:active:bg-primary-800"
               >
                 Save and Sign in
