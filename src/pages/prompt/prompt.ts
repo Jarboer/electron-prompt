@@ -1,17 +1,12 @@
 import { ipcRenderer } from 'electron';
 
 import { ElectronPromptOptions } from '../../electron-prompt';
-import { promptError, promptCancel, promptRegister } from '../prompt.controller';
-
-/**
- * The ID of the current prompt, extracted from the URL hash.
- */
-let promptId: string | null = null;
+import { promptError, promptCancel } from '../prompt.controller';
 
 /**
  * Submits the data from the prompt input to the main process.
  */
-export function promptSubmit(promptOptions: ElectronPromptOptions) {
+export function promptSubmit(promptOptions: ElectronPromptOptions, promptId: string) {
 	const dataElement = document.querySelector('#data') as HTMLElement | null;
 	let data: string | (string | null)[] | null = null; // TODO: Simplify
 
@@ -47,7 +42,7 @@ export function promptSubmit(promptOptions: ElectronPromptOptions) {
  *
  * @returns {HTMLInputElement} The created input element.
  */
-function promptCreateInput(promptOptions: ElectronPromptOptions) {
+export function promptCreateInput(promptOptions: ElectronPromptOptions, promptId: string) {
 	const dataElement = document.createElement('input');
 	dataElement.setAttribute('type', 'text');
 
@@ -94,7 +89,7 @@ function promptCreateInput(promptOptions: ElectronPromptOptions) {
  *
  * @returns {HTMLSelectElement} The created select element.
  */
-function promptCreateSelect(promptOptions: ElectronPromptOptions) {
+export function promptCreateSelect(promptOptions: ElectronPromptOptions) {
 	const dataElement = document.createElement('select');
 
 	// Populate the select element with options
@@ -116,19 +111,3 @@ function promptCreateSelect(promptOptions: ElectronPromptOptions) {
 
 	return dataElement;
 }
-
-/**
- * Global error handler for the prompt window, reports errors back to the main process.
- */
-window.addEventListener('error', error => {
-	if (promptId) {
-		promptError('An error has occurred on the prompt window: \n' + error.message, promptId);
-	}
-});
-
-/**
- * Registers the prompt when the DOM content is fully loaded.
- */
-document.addEventListener('DOMContentLoaded', () => {
-	promptId = promptRegister();
-});

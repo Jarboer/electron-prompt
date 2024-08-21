@@ -2,13 +2,18 @@ import fs from 'fs';
 import { ipcRenderer } from 'electron';
 
 import { ElectronPromptOptions } from '../electron-prompt';
-import { promptSubmit } from './prompt/prompt';
+import { promptCreateInput, promptCreateSelect, promptSubmit } from './prompt/prompt';
 import { loginPromptSubmit } from './login-prompt/login-prompt';
+
+/**
+ * The ID of the current prompt, extracted from the URL hash.
+ */
+let promptId: string | null = null;
 
 /**
  * Registers the prompt window and initializes it based on the retrieved options.
  */
-export function promptRegister(): string | null {
+function promptRegister() {
 	// Extract the prompt ID from the URL hash
 	let promptId: string | null = document.location.hash.replace('#', '');
 
@@ -18,8 +23,7 @@ export function promptRegister(): string | null {
 		// Retrieve prompt options from the main process
 		promptOptions = JSON.parse(ipcRenderer.sendSync('prompt-get-options:' + promptId));
 	} catch (error) {
-		promptError((error as any), promptId);
-		return null;
+		return promptError((error as any), promptId);
 	}
 
 	const title = document.getElementById("title") as HTMLHeadingElement | null;
@@ -75,8 +79,7 @@ export function promptRegister(): string | null {
 			}
 		}
 	} catch (error) {
-		promptError((error as any), promptId);
-		return null;
+		return promptError((error as any), promptId);
 	}
 
 	// Attach event listeners to the cancel button
@@ -93,27 +96,25 @@ export function promptRegister(): string | null {
 		form.addEventListener('submit', () => {
 			
 			if (promptOptions.type === 'input' || promptOptions.type === 'select') {
-				promptSubmit(promptOptions);
+				promptSubmit(promptOptions, promptId);
 			} else if (promptOptions.type === 'login') {
-				loginPromptSubmit(promptOptions);
+				loginPromptSubmit(promptOptions, promptId);
 			} 
 		});
 	} else {
-		promptError(`Unable to find the form element!`, promptId);
-		return null;
+		return promptError(`Unable to find the form element!`, promptId);
 	}
 
 	// Create and append the appropriate input element based on the prompt type
 	let dataElement;
 	if (promptOptions.type === 'input') {
-		dataElement = promptCreateInput(promptOptions);
+		dataElement = promptCreateInput(promptOptions, promptId);
 	} else if (promptOptions.type === 'select') {
 		dataElement = promptCreateSelect(promptOptions);
 	} else if (promptOptions.type === 'login') {
     	// dataElement = promptSetupLogin(promptOptions);
   	} else {
-		promptError(`Unhandled input type '${promptOptions.type}'`, promptId);
-		return null;
+		return promptError(`Unhandled input type '${promptOptions.type}'`, promptId);
 	}
 	
 	const dataContainerElement = document.querySelector('#data-container') as HTMLDivElement | null;
@@ -132,8 +133,6 @@ export function promptRegister(): string | null {
 			(dataElement as HTMLInputElement).select();
 		}
 	}
-
-	return promptId;
 }
 
 /**
@@ -155,3 +154,17 @@ export function promptError(error: Error | string, promptId: string | null) {
 export function promptCancel(promptId: string | null) {
 	ipcRenderer.sendSync('prompt-post-data:' + promptId, null);
 }
+
+/**
+ * Global error handler for the prompt window, reports errors back to the main process.
+ */
+window.addEventListener('error', error => {
+	if (promptId) {
+		promptError('An error has occurred on the prompt window: \n' + error.message, promptId);
+	}
+});
+
+/**
+ * Registers the prompt when the DOM content is fully loaded.
+ */
+document.addEventListener('DOMContentLoaded', promptRegister);

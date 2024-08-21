@@ -18,8 +18,9 @@ module.exports = [
     },
     entry: {
       'electron-prompt': { import: './src/electron-prompt.ts', filename: './[name].js' },
-      prompt: { import: './src/prompt/prompt.ts', filename: './[name]/[name].js' },
-      'login-prompt': { import: './src/login-prompt/login-prompt.ts', filename: './[name]/[name].js' },
+      prompt: { import: './src/pages/prompt/prompt.ts', filename: './pages/[name]/[name].js' },
+      'login-prompt': { import: './src/pages/login-prompt/login-prompt.ts', filename: './pages/[name]/[name].js' },
+      'prompt.controller': { import: './src/pages/prompt.controller.ts', filename: './pages/[name].js' },
     },
     output: {
       path: path.resolve(__dirname, 'lib'),
@@ -53,7 +54,7 @@ module.exports = [
         patterns: [
           // Copy all non ts files in prompt
           {
-            from: './prompt/**/*',
+            from: './pages/prompt/**/*',
             to: '[path][name][ext]',
             context: 'src',
             globOptions: {
@@ -62,17 +63,17 @@ module.exports = [
           },
           // Copy all non ts files in login-prompt
           {
-            from: './login-prompt/**/*',
+            from: './pages/login-prompt/**/*',
             to: '[path][name][ext]',
             context: 'src',
             globOptions: {
               ignore: ['**/*.ts'],
             },
           },
-          // Copy the css file in src
+          // Copy the css file in pages
           {
-            from: './tailwind-out.css',
-            to: '[path][name][ext]',
+            from: './pages/tailwind-out.css',
+            to: 'pages/tailwind-out.css',
             context: 'src',
           },
           { from: './types/**/*', to: '[path][name][ext]', context: 'src' }, // Copy all files in types

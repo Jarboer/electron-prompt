@@ -1,6 +1,6 @@
 {
   "name": "@jarboer/electron-prompt",
-  "version": "2.2.0-beta",
+  "version": "2.2.0",
   "description": "Electron helper to prompt for a value via input or select",
   "packageManager": "pnpm@9.0.0",
   "keywords": [
@@ -24,8 +24,8 @@
     "lint:fix": "xo --fix",
     "test": "pnpm lint",
     "build": "pnpx webpack-cli --config webpack.config.js",
-    "tailwind": "pnpx tailwindcss -i ./src/tailwind-in.css -o ./src/tailwind-out.css",
-    "tailwind:watch": "pnpx tailwindcss -i ./src/tailwind-in.css -o ./src/tailwind-out.css --watch"
+    "tailwind": "pnpx tailwindcss -i ./src/pages/tailwind-in.css -o ./src/pages/tailwind-out.css",
+    "tailwind:watch": "pnpx tailwindcss -i ./src/pages/tailwind-in.css -o ./src/pages/tailwind-out.css --watch"
   },
   "xo": {
     "esnext": true,

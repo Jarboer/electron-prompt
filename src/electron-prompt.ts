@@ -345,9 +345,9 @@ export function electronPrompt(options: ElectronPromptOptions, parentWindow?: Br
 		let devPath: string;
 
 		if (options_.type === "login") {
-			devPath = "C:\\Users\\jboersen\\Developer\\Node.js\\electron-prompt\\lib\\login-prompt\\login-prompt.html";
+			devPath = "C:/Users/jboersen/Developer/Node.js/electron-prompt/lib/pages/login-prompt/login-prompt.html";
 		} else {
-			devPath = "C:\\Users\\jboersen\\Developer\\Node.js\\electron-prompt\\lib\\prompt\\prompt.html";
+			devPath = "C:/Users/jboersen/Developer/Node.js/electron-prompt/lib/pages/prompt/prompt.html";
 		}
 
 		// Load the HTML file for the prompt window

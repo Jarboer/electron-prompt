@@ -5,17 +5,12 @@
 import { ipcRenderer } from 'electron';
 
 import { ElectronPromptOptions } from '../../electron-prompt';
-import { promptError, promptCancel, promptRegister } from '../prompt.controller';
-
-/**
- * The ID of the current prompt, extracted from the URL hash.
- */
-let promptId: string | null = null;
+import { promptError } from '../prompt.controller';
 
 /**
  * Submits the data from the prompt input to the main process.
  */
-export function loginPromptSubmit(promptOptions: ElectronPromptOptions) {
+export function loginPromptSubmit(promptOptions: ElectronPromptOptions, promptId: string) {
   let data: (string | null)[] | null = null;
 
   let usernameField = document.getElementById('username-field') as HTMLInputElement | null;
@@ -98,19 +93,3 @@ export function loginPromptSubmit(promptOptions: ElectronPromptOptions) {
 
 // 	return dataElement;
 // }
-
-/**
- * Global error handler for the prompt window, reports errors back to the main process.
- */
-window.addEventListener('error', error => {
-	if (promptId) {
-		promptError('An error has occurred on the prompt window: \n' + error.message, promptId);
-	}
-});
-
-/**
- * Registers the prompt when the DOM content is fully loaded.
- */
-document.addEventListener('DOMContentLoaded', () => {
-	promptId = promptRegister();
-});
