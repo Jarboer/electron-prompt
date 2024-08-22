@@ -15,7 +15,7 @@ const DEFAULT_WIDTH = 390;
 /**
  * The default height of the login prompt window.
  */
-const DEFAULT_LOGIN_HEIGHT = 420;
+const DEFAULT_LOGIN_HEIGHT = 440;
 /**
  * The default width of the login prompt window.
  */
