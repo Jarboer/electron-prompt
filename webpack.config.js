@@ -18,9 +18,7 @@ module.exports = [
     },
     entry: {
       'electron-prompt': { import: './src/electron-prompt.ts', filename: './[name].js' },
-      prompt: { import: './src/pages/prompt/prompt.ts', filename: './pages/[name]/[name].js' },
-      'login-prompt': { import: './src/pages/login-prompt/login-prompt.ts', filename: './pages/[name]/[name].js' },
-      'prompt.controller': { import: './src/pages/prompt.controller.ts', filename: './pages/[name].js' },
+      'prompt-controller': { import: './src/pages/prompt-controller.ts', filename: './pages/[name].js' },
     },
     output: {
       path: path.resolve(__dirname, 'lib'),

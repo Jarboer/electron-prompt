@@ -1,6 +1,6 @@
 {
   "name": "@jarboer/electron-prompt",
-  "version": "2.3.1",
+  "version": "2.3.2",
   "description": "Electron helper to prompt for a value via input or select",
   "packageManager": "pnpm@9.0.0",
   "keywords": [

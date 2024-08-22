@@ -1,5 +1,5 @@
 import { InputData, LabelData, StringDictionary } from "../electron-prompt";
-import { promptCancel } from "./prompt.controller";
+import { promptCancel } from "./prompt-controller";
 
 export function promptCreateLabel(labelData: LabelData) {
 	const labelElement = document.createElement('label');
