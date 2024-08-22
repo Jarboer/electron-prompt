@@ -266,7 +266,7 @@ const ipcMainRef = getElectronMainExport('ipcMain');
  * @param parentWindow - The parent window to which the prompt window will be modal.
  * @returns Resolves with the value entered by the user or null if the window is closed.
  */
-export function electronPrompt(options: ElectronPromptOptions, parentWindow?: BrowserWindow): Promise<string|null> {
+export function electronPrompt(options: ElectronPromptOptions, parentWindow?: BrowserWindow): Promise<string | (string | null)[] | null> {
 	return new Promise((resolve, reject) => {
 		const id = `${Date.now()}-${Math.random()}`;
 
@@ -422,7 +422,7 @@ export function electronPrompt(options: ElectronPromptOptions, parentWindow?: Br
 		 * @param event - The IPC event.
 		 * @param value - The value entered by the user.
 		 */
-		const postDataListener = (event: IpcMainEvent, value: string) => {
+		const postDataListener = (event: IpcMainEvent, value: string | (string | null)[] | null) => {
 			resolve(value);
 			event.returnValue = null;
 			cleanup();
@@ -467,18 +467,19 @@ export function electronPrompt(options: ElectronPromptOptions, parentWindow?: Br
 			});
 		}
 
-		let devPath: string;
+		let pagePath: string;
 
 		if (options_.type === "login") {
-			devPath = "C:/Users/jboersen/Developer/Node.js/electron-prompt/lib/pages/login-prompt/login-prompt.html";
+			// path = "C:/Users/jboersen/Developer/Node.js/electron-prompt/lib/pages/login-prompt/login-prompt.html";
+			pagePath = "pages/login-prompt/login-prompt.html";
 		} else {
-			devPath = "C:/Users/jboersen/Developer/Node.js/electron-prompt/lib/pages/prompt/prompt.html";
+			// path = "C:/Users/jboersen/Developer/Node.js/electron-prompt/lib/pages/prompt/prompt.html";
+			pagePath = "pages/prompt/prompt.html";
 		}
 
 		// Load the HTML file for the prompt window
 		promptWindow!.loadFile(
-			devPath, // TODO: Change back later
-			// path.join(__dirname, 'prompt', 'prompt.html'),
+			path.join(__dirname, pagePath), // pagePath,
 			{hash: id},
 		);
 	});
@@ -491,9 +492,9 @@ export function electronPrompt(options: ElectronPromptOptions, parentWindow?: Br
  * @param window The window to display the prompt on
  * @returns The result of the prompt after the user interacts with it
  */
-export async function betterPrompt(promptOptions: ElectronPromptOptions, window?: BrowserWindow): Promise<string | null> {
+export async function betterPrompt(promptOptions: ElectronPromptOptions, window?: BrowserWindow): Promise<string | (string | null)[] | null> {
 	// Used to store the result from the user
-	let result: string | null = null; // TODO: Allow arrays as well
+	let result: string | (string | null)[] | null = null;
 
 	// Prompt for the user's password
 	await electronPrompt(promptOptions, window)

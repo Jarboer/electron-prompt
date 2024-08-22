@@ -8,8 +8,8 @@ module.exports = [
   // Node Configuration
   {
     watch: false,
-    mode: 'development', // TODO: Switch to 'production' later
-    // TODO: Remove on publish
+    // mode: 'development',
+    mode: 'production',
     // devtool: 'source-map', // Use inline-source-map for better debugging during development
     target: 'node', // use require() & use NodeJs CommonJS style
     externals: [nodeExternals()], // in order to ignore all modules in node_modules folder

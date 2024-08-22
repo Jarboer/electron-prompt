@@ -12,7 +12,7 @@ let promptId: string | null = null;
 /**
  * Submits the data from the prompt input to the main process.
  */
-export function promptSubmit(promptOptions: ElectronPromptOptions, promptId: string) {
+function promptSubmit(promptOptions: ElectronPromptOptions, promptId: string) {
 	const dataContainerElement = document.getElementById('data-container') as HTMLDivElement | null;
 
 	let data: string | (string | null)[] | null = null; // TODO: Simplify
