@@ -9,7 +9,7 @@ Electron helper to prompt for a value via input or select
 ## Installation
 
 ```sh
-npm install electron-prompt
+npm i @jarboer/electron-prompt
 ```
 
 ## Examples
