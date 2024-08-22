@@ -1,106 +1,89 @@
 import fs from 'fs';
 import { ipcRenderer } from 'electron';
 
-import { ElectronPromptOptions, InputData, LabelData } from '../electron-prompt';
-import { promptCreateSelect, promptSubmit } from './prompt/prompt';
-// import { loginPromptSubmit } from './login-prompt/login-prompt';
+import { ElectronPromptOptions } from '../electron-prompt';
+import { promptCreateInput, promptCreateLabel, promptCreateSelect, setupDataContainer } from './prompt-builder';
 
 /**
  * The ID of the current prompt, extracted from the URL hash.
  */
 let promptId: string | null = null;
 
-function promptCreateLabel(labelData: LabelData) {
-	const labelElement = document.createElement('label');
-
-	if (labelData.htmlFor) {
-		labelElement.htmlFor = labelData.htmlFor;
-	}
-
-	// Set the label in the prompt window
-	if (labelData.content) {
-		if (labelData.useHtmlLabel) {
-			labelElement.innerHTML = labelData.content;
-		} else {
-			labelElement.textContent = labelData.content;
-		}
-	}
-
-	labelElement.className = "mb-2 block text-sm font-medium";
-
-	return labelElement;
-}
-
 /**
- * Creates an input element based on the prompt options.
- *
- * @returns {HTMLInputElement} The created input element.
+ * Submits the data from the prompt input to the main process.
  */
-function promptCreateInput(inputData: InputData, promptId: string) {
-	const dataElement = document.createElement('input');
-	dataElement.className = 'block w-full rounded-lg border border-gray-300 bg-gray-100 p-2.5 focus:border-primary-600 focus:outline-none focus:ring-1 focus:ring-primary-600 dark:border-gray-600 dark:bg-gray-700 dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500';
-	
-	if (inputData.id) {
-		dataElement.id = inputData.id;
-		dataElement.name = inputData.id;
+export function promptSubmit(promptOptions: ElectronPromptOptions, promptId: string) {
+	const dataContainerElement = document.getElementById('data-container') as HTMLDivElement | null;
+
+	let data: string | (string | null)[] | null = null; // TODO: Simplify
+
+	if (dataContainerElement === null) {
+		return promptError("Error: Unable to find the data-container!", promptId);
 	}
 
-	// Set input's value if provided, otherwise, set it to a blank string
-	dataElement.value = inputData.value ?? '';
+	if (promptOptions.type === 'input' || promptOptions.type === 'login') {
+		const inputNodes = dataContainerElement.querySelectorAll('input');
 
-	// Set input's placeholder if provided, otherwise, set it to a blank string
-	dataElement.placeholder = inputData.placeholder ?? '';
-	
-	// Apply additional input attributes if provided
-	const inputAttrs = inputData.inputAttrs;
-	if (inputAttrs && typeof inputAttrs === 'object') {
-		for (const k in inputAttrs) {
-			if (Object.prototype.hasOwnProperty.call(inputAttrs, k)) {
-				const value = inputAttrs[k as keyof typeof inputAttrs];
+		if (inputNodes.length == 1) {
+			let inputData = getInputData(inputNodes[0]);
 
-				if (value !== undefined && value !== null) {
-					dataElement.setAttribute(k, String(value));
+			if (inputNodes.length > 0) {
+				data = inputData;
+			} else { // If inputData is undefined then an error occurred so return early
+				return promptError("Error: Unable to find the input element!", promptId);
+			}
+		} else {
+			data = [];
+
+			for (let index = 0; index < inputNodes.length; index++) {
+				let inputData = getInputData(inputNodes[index]);
+
+				if (inputNodes.length > 0) {
+					data.push(inputData);
+				} else { // If inputData is undefined then an error occurred so return early
+					return promptError(`Error: Unable to find the input element at index ${index}!`, promptId);
 				}
 			}
 		}
+	} else if (promptOptions.type === 'select') {
+		const selectNodes = dataContainerElement.querySelectorAll('select');
+
+		let selectData = getSelectData(selectNodes[0], promptOptions.selectMultiple);
+
+		if (selectNodes.length > 0) {
+			data = selectData;
+		} else { // If selectData is undefined then an error occurred so return early
+			return promptError("Error: Unable to find the select element!", promptId);
+		}
 	}
 
-	// Add event listeners for cancel and submit actions
-	dataElement.addEventListener('keyup', event => {
-		if (event.key === 'Escape') {
-			promptCancel(promptId);
-		}
-	});
-
-	dataElement.addEventListener('keypress', event => {
-		if (event.key === 'Enter') {
-			event.preventDefault();
-
-			let okBtn = document.getElementById('submit') as HTMLButtonElement | null;
-			okBtn?.click();
-		}
-	});
-
-	return dataElement;
+	ipcRenderer.sendSync('prompt-post-data:' + promptId, data);
 }
 
-function setupDataContainer(labelElement: HTMLLabelElement | null, dataElement: HTMLInputElement | HTMLSelectElement) {
-	const dataContainerElement = document.getElementById('data-container') as HTMLDivElement | null;
-
-	if (dataContainerElement) {
-		/* This div is used as a container for the label and input. It also will have a top space added 
-		   as applicable due to the classes on the data-container. This helps visual separate multiple
-		   containers and their contents */
-		const containerDiv = document.createElement('div');
-
-		if (labelElement) {
-			containerDiv.appendChild(labelElement);
-		}
-		
-		containerDiv.append(dataElement);
-
-		dataContainerElement.appendChild(containerDiv);
+function getInputData(inputNode: HTMLInputElement) {
+	let data: string; 
+	
+	// Handle file input or text input
+	if (inputNode.files != undefined || inputNode.files != null) {
+		data = inputNode.files[0].path;
+	} else {
+		data = inputNode.value;
 	}
+	
+	return data;
+}
+
+function getSelectData(selectNode: HTMLSelectElement, selectMultiple: boolean | undefined) {
+	let data: string | (string | null)[]; 
+
+	// Handle single or multiple select
+	if (selectMultiple) {
+		data = Array.from(selectNode.querySelectorAll('option[selected]')).map(el => el.getAttribute('value'));
+	} else {
+		data = selectNode.value;
+	}
+
+	return data;
 }
 
 /**
