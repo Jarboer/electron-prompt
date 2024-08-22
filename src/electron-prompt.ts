@@ -470,16 +470,16 @@ export function electronPrompt(options: ElectronPromptOptions, parentWindow?: Br
 		let pagePath: string;
 
 		if (options_.type === "login") {
-			// path = "C:/Users/jboersen/Developer/Node.js/electron-prompt/lib/pages/login-prompt/login-prompt.html";
-			pagePath = "pages/login-prompt/login-prompt.html";
+			// pagePath = "C:/Users/jboersen/Developer/Node.js/electron-prompt/lib/pages/login-prompt/login-prompt.html";
+			pagePath = path.join(__dirname, "pages/login-prompt/login-prompt.html");
 		} else {
-			// path = "C:/Users/jboersen/Developer/Node.js/electron-prompt/lib/pages/prompt/prompt.html";
-			pagePath = "pages/prompt/prompt.html";
+			// pagePath = "C:/Users/jboersen/Developer/Node.js/electron-prompt/lib/pages/prompt/prompt.html";
+			pagePath = path.join(__dirname, "pages/prompt/prompt.html");
 		}
 
 		// Load the HTML file for the prompt window
 		promptWindow!.loadFile(
-			path.join(__dirname, pagePath), // pagePath,
+			pagePath,
 			{hash: id},
 		);
 	});
