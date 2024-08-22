@@ -14,7 +14,9 @@ npm i @jarboer/electron-prompt
 
 ## Examples
 
-### Example 1 - betterPrompt
+See [basic-prompt-example](https://github.com/Jarboer/basic-prompt-example) for more an example program.
+
+### Example 1 - Using betterPrompt()
 
 ```js
 import { app, BrowserWindow } from 'electron';
@@ -48,7 +50,7 @@ if (result) {
 }
 ```
 
-### Example 2 - prompt
+### Example 2 - Using prompt()
 
 ```js
 import { prompt } from 'electron-prompt';
