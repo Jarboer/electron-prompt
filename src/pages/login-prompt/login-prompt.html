@@ -14,9 +14,8 @@
 
     <script src="../prompt.controller.js"></script>
   </head>
-  <body>
-    <section class="bg-gray-50 dark:bg-gray-900">
-      <div class="mx-auto flex flex-col items-center justify-center px-6 py-8 md:h-screen lg:py-0">
+  <body class="bg-gray-50 dark:bg-gray-900">
+    <section class="mx-auto flex flex-col items-center justify-center px-6 py-8 md:h-screen lg:py-0">
         <h1 id="title" class="mb-6 flex items-center text-3xl font-bold">
           <!-- <img
             class="mr-2 h-8 w-8"
@@ -28,41 +27,19 @@
           class="w-full rounded-lg bg-white shadow dark:border dark:border-gray-700 dark:bg-gray-800 sm:max-w-md md:mt-0 xl:p-0"
         >
           <div class="space-y-4 p-6 sm:p-8 md:space-y-6">
-            <h2 id="label" class="text-xl font-bold leading-tight tracking-tight md:text-2xl"></h2>
+            <h2 id="subtitle" class="text-xl font-bold leading-tight tracking-tight md:text-2xl"></h2>
             <form id="form" class="space-y-4 md:space-y-6">
-              <div>
-                <label for="username-field" class="mb-2 block text-sm font-medium">Username</label>
-                <input
-                  type="text"
-                  name="username-field"
-                  id="username-field"
-                  class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 focus:border-primary-600 focus:outline-none focus:ring-1 focus:ring-primary-600 dark:border-gray-600 dark:bg-gray-700 dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500"
-                  placeholder="username.mva"
-                  required=""
-                />
-              </div>
-              <div>
-                <label for="password-field" class="mb-2 block text-sm font-medium">Password</label>
-                <input
-                  type="password"
-                  name="password-field"
-                  id="password-field"
-                  placeholder="••••••••"
-                  class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 focus:border-primary-600 focus:outline-none focus:ring-1 focus:ring-primary-600 dark:border-gray-600 dark:bg-gray-700 dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500"
-                  required=""
-                />
-              </div>
+              <div id="data-container" class="space-y-4 md:space-y-6"></div>
               <button
                 type="submit"
-                id="save-btn"
+                id="submit"
                 class="w-full rounded-lg bg-primary-600 px-5 py-2.5 text-center text-sm font-medium text-white hover:bg-primary-700 focus:outline-none focus:ring-4 focus:ring-primary-300 active:bg-primary-800 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-500 dark:active:bg-primary-800"
               >
-                Save and Sign in
+                Sign in
               </button>
             </form>
           </div>
         </div>
-      </div>
     </section>
   </body>
 </html>

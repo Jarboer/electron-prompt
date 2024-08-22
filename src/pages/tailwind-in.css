@@ -6,3 +6,8 @@
 button {
     @apply select-none
 }
+
+/* Disable this default added by tailwind */
+form {
+    margin-block-end: 0em;
+}

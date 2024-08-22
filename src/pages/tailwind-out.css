@@ -807,12 +807,22 @@ video {
   box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
 }
 
+.\[margin-block-end\:0em\] {
+  margin-block-end: 0em;
+}
+
 /* Make it so all buttons have unselectable text by default */
 
 button {
   -webkit-user-select: none;
      -moz-user-select: none;
           user-select: none;
+}
+
+/* Disable this default added by tailwind */
+
+form {
+  margin-block-end: 0em;
 }
 
 .hover\:bg-gray-300:hover {

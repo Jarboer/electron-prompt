@@ -1,87 +1,83 @@
 import { ipcRenderer } from 'electron';
 
-import { ElectronPromptOptions } from '../../electron-prompt';
-import { promptError, promptCancel } from '../prompt.controller';
+import { ElectronPromptOptions, StringDictionary } from '../../electron-prompt';
+import { promptError } from '../prompt.controller';
 
 /**
  * Submits the data from the prompt input to the main process.
  */
 export function promptSubmit(promptOptions: ElectronPromptOptions, promptId: string) {
-	const dataElement = document.querySelector('#data') as HTMLElement | null;
+	const dataContainerElement = document.getElementById('data-container') as HTMLDivElement | null;
+
 	let data: string | (string | null)[] | null = null; // TODO: Simplify
 
-	if (dataElement === null) {
-		return promptError("Error: Unable to find the #data element!", promptId);
+	if (dataContainerElement === null) {
+		return promptError("Error: Unable to find the data-container!", promptId);
 	}
 
-	if (promptOptions.type === 'input') {
-		const InputElement = dataElement as HTMLInputElement;
+	if (promptOptions.type === 'input' || promptOptions.type === 'login') {
+		const inputNodes = dataContainerElement.querySelectorAll('input');
 
-		// Handle file input or text input
-		if (InputElement.files != undefined || InputElement.files != null) {
-			data = InputElement.files[0].path;
+		if (inputNodes.length == 1) {
+			let inputData = getInputData(inputNodes[0]);
+
+			if (inputNodes.length > 0) {
+				data = inputData;
+			} else { // If inputData is undefined then an error occurred so return early
+				return promptError("Error: Unable to find the input element!", promptId);
+			}
 		} else {
-			data = InputElement.value;
+			data = [];
+
+			for (let index = 0; index < inputNodes.length; index++) {
+				let inputData = getInputData(inputNodes[index]);
+
+				if (inputNodes.length > 0) {
+					data.push(inputData);
+				} else { // If inputData is undefined then an error occurred so return early
+					return promptError(`Error: Unable to find the input element at index ${index}!`, promptId);
+				}
+			}
 		}
 	} else if (promptOptions.type === 'select') {
-		const selectElement = dataElement as HTMLSelectElement;
+		const selectNodes = dataContainerElement.querySelectorAll('select');
 
-		// Handle single or multiple select
-		if (promptOptions.selectMultiple) {
-			data = Array.from(selectElement.querySelectorAll('option[selected]')).map(el => el.getAttribute('value'));
-		} else {
-			data = selectElement.value;
+		let selectData = getSelectData(selectNodes[0], promptOptions.selectMultiple);
+
+		if (selectNodes.length > 0) {
+			data = selectData;
+		} else { // If selectData is undefined then an error occurred so return early
+			return promptError("Error: Unable to find the select element!", promptId);
 		}
 	}
 
 	ipcRenderer.sendSync('prompt-post-data:' + promptId, data);
 }
 
-/**
- * Creates an input element based on the prompt options.
- *
- * @returns {HTMLInputElement} The created input element.
- */
-export function promptCreateInput(promptOptions: ElectronPromptOptions, promptId: string) {
-	const dataElement = document.createElement('input');
-	dataElement.setAttribute('type', 'text');
+function getInputData(inputNode: HTMLInputElement) {
+	let data: string; 
+	
+	// Handle file input or text input
+	if (inputNode.files != undefined || inputNode.files != null) {
+		data = inputNode.files[0].path;
+	} else {
+		data = inputNode.value;
+	}
+	
+	return data;
+}
 
-	// Set input's value if provided, otherwise, set it to a blank string
-	dataElement.value = promptOptions.value ?? '';
+function getSelectData(selectNode: HTMLSelectElement, selectMultiple: boolean | undefined) {
+	let data: string | (string | null)[]; 
 
-	// Set input's placeholder if provided, otherwise, set it to a blank string
-	dataElement.placeholder = promptOptions.placeholder ?? '';
-
-	// Apply additional input attributes if provided
-	if (promptOptions.inputAttrs && typeof promptOptions.inputAttrs === 'object') {
-		for (const k in promptOptions.inputAttrs) {
-			if (Object.prototype.hasOwnProperty.call(promptOptions.inputAttrs, k)) {
-				const value = promptOptions.inputAttrs[k as keyof typeof promptOptions.inputAttrs];
-
-				if (value !== undefined && value !== null) {
-					dataElement.setAttribute(k, String(value));
-				}
-			}
-		}
+	// Handle single or multiple select
+	if (selectMultiple) {
+		data = Array.from(selectNode.querySelectorAll('option[selected]')).map(el => el.getAttribute('value'));
+	} else {
+		data = selectNode.value;
 	}
 
-	// Add event listeners for cancel and submit actions
-	dataElement.addEventListener('keyup', event => {
-		if (event.key === 'Escape') {
-			promptCancel(promptId);
-		}
-	});
-
-	dataElement.addEventListener('keypress', event => {
-		if (event.key === 'Enter') {
-			event.preventDefault();
-
-			let okBtn = document.querySelector('#ok') as HTMLButtonElement | null;
-			okBtn?.click();
-		}
-	});
-
-	return dataElement;
+	return data;
 }
 
 /**
@@ -89,23 +85,24 @@ export function promptCreateInput(promptOptions: ElectronPromptOptions, promptId
  *
  * @returns {HTMLSelectElement} The created select element.
  */
-export function promptCreateSelect(promptOptions: ElectronPromptOptions) {
+export function promptCreateSelect(selectOptions: StringDictionary | undefined, defaultSelectOption: string | undefined) {
 	const dataElement = document.createElement('select');
+	dataElement.className = 'block w-full rounded-lg border border-gray-300 bg-gray-100 p-2.5 focus:border-primary-600 focus:outline-none focus:ring-1 focus:ring-primary-600 dark:border-gray-600 dark:bg-gray-700 dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500';
 
 	// Populate the select element with options
-	for (const [key, text] of Object.entries(promptOptions.selectOptions ?? {})) {
+	for (const [key, text] of Object.entries(selectOptions ?? {})) {
 		const optionElement = document.createElement('option');
 		optionElement.value = key;
 		optionElement.textContent = text;
 	
-		if (key === promptOptions.value) {
+		if (defaultSelectOption && key === defaultSelectOption) {
 			optionElement.selected = true;
 		}
 	
 		dataElement.append(optionElement);
 	}
 
-	if (promptOptions.selectOptions == undefined) {
+	if (selectOptions == undefined) {
 		console.warn("Warning: selectOptions is undefined. The select element will be empty.");
 	}
 

@@ -1,19 +1,25 @@
 import path from 'path';
-import electron, { BrowserWindow, IpcMainEvent } from 'electron';
+import electron, { BrowserWindow, BrowserWindowConstructorOptions, IpcMainEvent } from 'electron';
 
 // import { ElectronPromptOptions } from './electron-prompt-type';
 
 /**
+ * The default height of the prompt window.
+*/
+const DEFAULT_HEIGHT = 200;
+/**
  * The default width of the prompt window.
- * @constant {number}
  */
 const DEFAULT_WIDTH = 390;
 
 /**
- * The default height of the prompt window.
- * @constant {number}
+ * The default height of the login prompt window.
  */
-const DEFAULT_HEIGHT = 180;
+const DEFAULT_LOGIN_HEIGHT = 540;
+/**
+ * The default width of the login prompt window.
+ */
+const DEFAULT_LOGIN_WIDTH = 600;
 
 /**
  * Used to define an input element's type
@@ -22,8 +28,69 @@ const DEFAULT_HEIGHT = 180;
 export type InputElement = 'button' | 'checkbox' | 'color' | 'date' | 'datetime-local' | 'email' | 'file' | 'hidden' | 'image' | 'month' | 'number' |
     'password' | 'radio' | 'range' | 'reset' | 'search' | 'submit' | 'tel' | 'text' | 'time' | 'url' | 'week';
 
+/**
+ * Used to define a string dictionary where the key and value are strings.
+ */
+export type StringDictionary = {
+	[key: string]: string;
+}
+
+export interface LabelData {
+	/**
+	 * The label which appears on the prompt for the input field. Defaults to nothing/undefined.
+	 */
+	content?: string;
+	/**
+	 * Defines which html element the label is for. Defaults to nothing/undefined.
+	 */
+	htmlFor?: string;
+	/**
+	 * Whether the label should be interpreted as HTML or not. Defaults to false.
+	 */
+	useHtmlLabel?: boolean;
+}
+
+// TODO: Allow undefined?
+interface InputAttrs {
+	/**
+	 * Define the input element's type.
+	 */
+	type: InputElement;
+	/**
+	 * Define if the input element is required to be completed in a form.
+	 */
+	required: boolean;
+}
+
+export interface InputData {
+	/**
+	 * The id for the input element which appears on the prompt for the input field. The name will 
+	 * also be set to this (for labels). Defaults to nothing/undefined.
+	 */
+	id?: string;
+	/**
+	 * The placeholder which appears on the prompt for the input field. Defaults to being blank/undefined.
+	 */
+	placeholder?: string;
+	/**
+	 * The default value for the input field. Defaults to being blank/undefined.
+	 */
+	value?: string;
+	/**
+	 * The attributes of the input field, analogous to the HTML attributes: `{type: 'text', required: true}` -> `<input type="text" required>`.
+	 * Used if the `type` is 'input'.
+	 */
+	inputAttrs?: InputAttrs;
+}
+
 interface ButtonLabels  {
-	ok?: string;
+	/**
+	 * Define the display text for the submit button.
+	 */
+	submit?: string;
+	/**
+	 * Define the display text for the cancel button.
+	 */
 	cancel?: string;
 }
 
@@ -32,53 +99,63 @@ interface ButtonLabels  {
  */
 export interface ElectronPromptOptions {
 	/**
-	 * The title of the prompt window. Defaults to 'Prompt'.
+	 * The title of the prompt window. Defaults to 'Prompt', or to 'Sign into your Account' for the 'login' `type`.
 	 */
-	// TODO: It will say something different for login
 	title?: string;
 	/**
-	 * The label which appears on the prompt for the input field. Defaults to 'Please input a value:'.
+	 * Whether the `title` should be interpreted as HTML or not. Defaults to false.
 	 */
-	// TODO: It will say something different for login
-	label?: string;
+	useHtmlTitle?: boolean;
 	/**
-	 * The placeholder which appears on the prompt for the input field. Defaults to blank.
+	 * The subtitle of the prompt window. Defaults to 'Please input a value', or to 'Enter your account credentials' for the 'login' `type`.
 	 */
-	placeholder?: string;
+	subtitle?: string;
 	/**
-	 * The text for the OK/cancel buttons. Properties are 'ok' and 'cancel'. Defaults to null.
+	 * Whether the `subtitle` should be interpreted as HTML or not. Defaults to false.
 	 */
-	buttonLabels?: ButtonLabels | null;
+	useHtmlSubtitle?: boolean;
 	/**
-	 * The default value for the input field. Defaults to null.
+	 * The type of input field/prompt, enter 'input' for a standard text input field, 
+	 * 'select' for a dropdown type input, or 'login' for a prompt with 2 input fields 
+	 * setup to take a username/email and password. Defaults to 'input'.
 	 */
-	value?: string;
+	type?: 'input' | 'select' | 'login';
 	/**
-	 *  The type of input field, either 'input' for a standard text input field or 'select' for a dropdown type input. Defaults to 'input'.
+	 * The options for the label(s). Defaults to nothing/undefined for the 'input' `type`, or stuff relating to username, and password for 'login'.
 	 */
-	// TODO: Add mention about login
-	type?: "input" | "select" | "login";
+	labelOptions?: LabelData[];
 	/**
-	 * The attributes of the input field, analogous to the HTML attributes: `{type: 'text', required: true}` -> `<input type="text" required>`.
-	 * Used if the type is 'input'
+	 * The options for the text input(s). Defaults to text and required for the 'input' `type`, or text and password for a username and password respectively for 'login'.
 	 */
-	inputAttrs?: {
-		type: InputElement;
-		required: boolean;
-	};
+	inputTextOptions?: InputData[];
 	/**
-	 * The items for the select dropdown if using the 'select' type in the format 'value': 'display text', where the value is what will be given
-	 * to the then block and the display text is what the user will see.
+	 * The text for the submit/cancel buttons. Defaults to 'Ok' and 'Cancel', or to 
+	 * 'Sign in' for the 'login' `type` (note: the cancel button isn't shown for 'login').
 	 */
-	selectOptions?: object;
-	// TODO: Comment on
+	buttonLabels?: ButtonLabels;
+	/**
+	 * The items for the select dropdown if using the 'select' `type` in the format '`<value>`': '`<display text>`',
+	 * where the `<value>` is what will be given to the then block and the `<display text>` is what the user will see. Defaults to nothing/undefined.
+	*/
+	selectOptions?: StringDictionary;
+	/**
+	 * The default option to select when using the 'select' `type`. Defaults to nothing/undefined.
+	 */
+	defaultSelectOption?: string;
+	/**
+	 * Allows multiple options to be selected when using the 'select' `type`. Defaults to nothing/undefined.
+	 */
 	selectMultiple?: boolean;
 	/**
-	 * Whether the label should be interpreted as HTML or not. Defaults to false.
-	 */
-	useHtmlLabel?: boolean;
+	 * The height of the prompt window. Defaults to 180, or to 540 for the 'login' `type`.
+	*/
+	height?: number;
 	/**
-	 * The width of the prompt window. Defaults to 370.
+	 * The minimum allowed height for the prompt window. Same default value as height.
+	*/
+	minHeight?: number;
+	/**
+	 * The width of the prompt window. Defaults to 390, or to 600 for the 'login' `type`.
 	 */
 	width?: number;
 	/**
@@ -86,15 +163,7 @@ export interface ElectronPromptOptions {
 	 */
 	minWidth?: number;
 	/**
-	 * The height of the prompt window. Defaults to 130.
-	 */
-	height?: number;
-	/**
-	 * The minimum allowed height for the prompt window. Same default value as height.
-	 */
-	minHeight?: number;
-	/**
-	 * Whether the prompt window can be resized or not (also sets useContentSize). Defaults to false.
+	 * Whether the prompt window can be resized or not (also sets `useContentSize`). Defaults to false.
 	 */
 	resizable?: boolean;
 	/**
@@ -111,15 +180,15 @@ export interface ElectronPromptOptions {
 	 */
 	maximizable?: boolean;
 	/**
-	 * Whether the window should always stay on top of other windows. Defaults to false
+	 * Whether the window should always stay on top of other windows. Defaults to false.
 	 */
 	alwaysOnTop?: boolean;
 	/**
-	 * The path to an icon image to use in the title bar. Defaults to null and uses electron's icon.
+	 * The path to an icon image to use in the title bar. Defaults to undefined and uses electron's icon.
 	 */
 	icon?: string;
 	/**
-	 * The local path of a CSS file to stylize the prompt window. Defaults to null.
+	 * The local path of a CSS file to stylize the prompt window. Defaults to undefined.
 	 */
 	customStylesheet?: string;
 	/**
@@ -127,7 +196,7 @@ export interface ElectronPromptOptions {
 	 */
 	menuBarVisible?: boolean;
 	/**
-	 * Whether to show the prompt window icon in taskbar. Defaults to true.
+	 * Whether to not show the prompt window icon on taskbar. Defaults to true.
 	 */
 	skipTaskbar?: boolean;
 	/**
@@ -136,7 +205,7 @@ export interface ElectronPromptOptions {
 	showWhenReady?: boolean;
 	/**
 	 * Whether to enable dev tools for the prompt window (also shows the menu bar).
-	 * You will want to enable resizing. Defaults to false.
+	 * You'll probably want to enable resizing. Defaults to false.
 	 */
 	devMode?: boolean;
 }
@@ -201,39 +270,95 @@ export function electronPrompt(options: ElectronPromptOptions, parentWindow?: Br
 	return new Promise((resolve, reject) => {
 		const id = `${Date.now()}-${Math.random()}`;
 
-		// BrowserWindowConstructorOptions is the type for the BrowserWindow options
+		// NOTE: BrowserWindowConstructorOptions is the type for the BrowserWindow options
 
-		// TODO: Customize for login
+		let defaultValues: ElectronPromptOptions;
 
-		// Merge user-provided options with defaults
-		const options_ = Object.assign(
-			{
-				width: DEFAULT_WIDTH,
-				height: DEFAULT_HEIGHT,
-				minWidth: DEFAULT_WIDTH,
-				minHeight: DEFAULT_HEIGHT,
+		if (options.type === "login") {
+			defaultValues = {
+				title: 'Sign into your Account',
+				useHtmlTitle: false,
+				subtitle: 'Enter your account credentials',
+				useHtmlSubtitle: false,
+				labelOptions: [
+					{
+						content: "Username",
+						htmlFor: "username-field",
+						useHtmlLabel: false
+					},
+					{
+						content: "Password",
+						htmlFor: "username-field",
+						useHtmlLabel: false
+					}
+				],
+				inputTextOptions: [
+					{
+						id: "username-field",
+						placeholder: "username",
+						inputAttrs: {
+							type: "text",
+							required: true
+						}
+					},
+					{
+						id: "password-field",
+						placeholder: "••••••••",
+						inputAttrs: {
+							type: "password",
+							required: true
+						}
+					}
+				],
+				height: DEFAULT_LOGIN_HEIGHT,
+				width: DEFAULT_LOGIN_WIDTH,
+				minHeight: DEFAULT_LOGIN_HEIGHT,
+				minWidth: DEFAULT_LOGIN_WIDTH,
 				resizable: false,
 				minimizable: false,
 				fullscreenable: false,
-				maximizable: true,
-				title: 'Prompt',
-				label: 'Please input a value:',
-				placeholder: '',
-				buttonLabels: null,
+				maximizable: false,
 				alwaysOnTop: false,
-				value: null,
-				type: 'input',
-				selectOptions: null,
-				icon: null,
-				useHtmlLabel: false,
-				customStylesheet: null,
 				menuBarVisible: false,
 				skipTaskbar: true,
 				showWhenReady: false,
 				devMode: false
-			},
-			options || {},
-		) as ElectronPromptOptions;
+			}
+		} else {
+			defaultValues = {
+				title: 'Prompt',
+				useHtmlTitle: false,
+				subtitle: 'Please input a value',
+				useHtmlSubtitle: false,
+				type: 'input',
+				inputTextOptions: [
+					{
+						inputAttrs: {
+							type: "text",
+							required: true
+						}
+					}
+				],
+				height: DEFAULT_HEIGHT,
+				width: DEFAULT_WIDTH,
+				minHeight: DEFAULT_HEIGHT,
+				minWidth: DEFAULT_WIDTH,
+				resizable: false,
+				minimizable: false,
+				fullscreenable: false,
+				maximizable: false,
+				alwaysOnTop: false,
+				menuBarVisible: false,
+				skipTaskbar: true,
+				showWhenReady: false,
+				devMode: false
+			}
+		}
+
+		// Merge user-provided options with defaults
+		let options_: ElectronPromptOptions = Object.assign(defaultValues, options || {});
+
+		// TODO: Add type check for inputTextOptions
 
 		// Validate select options if the prompt type is 'select'
 		if (options_.type === 'select' && (options_.selectOptions === null || typeof options_.selectOptions !== 'object')) {
@@ -242,10 +367,10 @@ export function electronPrompt(options: ElectronPromptOptions, parentWindow?: Br
 		}
 
 		let promptWindow = new BrowserWindowRef({
-			width: options_.width,
 			height: options_.height,
-			minWidth: options_.minWidth,
+			width: options_.width,
 			minHeight: options_.minHeight,
+			minWidth: options_.minWidth,
 			resizable: options_.resizable,
 			minimizable: options_.minimizable,
 			fullscreenable: options_.fullscreenable,
@@ -263,11 +388,11 @@ export function electronPrompt(options: ElectronPromptOptions, parentWindow?: Br
 				contextIsolation: false,
 				devTools: options_.devMode,
 			},
-		});
+		} as BrowserWindowConstructorOptions) as BrowserWindow | null;
 
 		if (!options_.devMode) {
-			promptWindow.setMenu(null);
-			promptWindow.setMenuBarVisibility(options_.menuBarVisible);
+			promptWindow!.setMenu(null);
+			promptWindow!.setMenuBarVisibility(options_.menuBarVisible!);
 		}
 
 		/**
@@ -326,10 +451,10 @@ export function electronPrompt(options: ElectronPromptOptions, parentWindow?: Br
 		ipcMainRef.on('prompt-get-options:' + id, getOptionsListener);
 		ipcMainRef.on('prompt-post-data:' + id, postDataListener);
 		ipcMainRef.on('prompt-error:' + id, errorListener);
-		promptWindow.on('unresponsive', unresponsiveListener);
+		promptWindow!.on('unresponsive', unresponsiveListener);
 
 		// Handle the prompt window closing event
-		promptWindow.on('closed', () => {
+		promptWindow!.on('closed', () => {
 			promptWindow = null;
 			cleanup();
 			resolve(null);
@@ -337,8 +462,8 @@ export function electronPrompt(options: ElectronPromptOptions, parentWindow?: Br
 
 		// Show the prompt window when ready if the option is set
 		if (options_.showWhenReady) {
-			promptWindow.once('ready-to-show', () => {
-				promptWindow.show();
+			promptWindow!.once('ready-to-show', () => {
+				promptWindow!.show();
 			});
 		}
 
@@ -351,7 +476,7 @@ export function electronPrompt(options: ElectronPromptOptions, parentWindow?: Br
 		}
 
 		// Load the HTML file for the prompt window
-		promptWindow.loadFile(
+		promptWindow!.loadFile(
 			devPath, // TODO: Change back later
 			// path.join(__dirname, 'prompt', 'prompt.html'),
 			{hash: id},
@@ -362,28 +487,28 @@ export function electronPrompt(options: ElectronPromptOptions, parentWindow?: Br
 /**
  * This method is used as a wrapper to create a better prompt
  *
- * @param promptInfo The PromptInfo object to define how the prompt will look
+ * @param promptOptions The PromptInfo object to define how the prompt will look
  * @param window The window to display the prompt on
  * @returns The result of the prompt after the user interacts with it
  */
-export async function betterPrompt(promptInfo: ElectronPromptOptions, window?: BrowserWindow): Promise<string | null> {
+export async function betterPrompt(promptOptions: ElectronPromptOptions, window?: BrowserWindow): Promise<string | null> {
 	// Used to store the result from the user
-	let result: string | null = null;
+	let result: string | null = null; // TODO: Allow arrays as well
 
 	// Prompt for the user's password
-	await electronPrompt(promptInfo, window)
+	await electronPrompt(promptOptions, window)
 		.then((r: any) => {
 			// If the result is null then the user canceled
 			if (r === null) {
 				// Used to store the message about the prompt that was canceled
-				let msg = `The user canceled the ${promptInfo.type ?? 'input'} prompt`;
+				let msg = `The user canceled the ${promptOptions.type ?? 'input'} prompt`;
 
-				if (promptInfo.title !== undefined && promptInfo.label !== undefined) {
-					msg += ` with the title "${promptInfo.title}" and the label "${promptInfo.label}"`;
-				} else if (promptInfo.title !== undefined) {
-					msg += ` with the title "${promptInfo.title}"`;
-				} else if (promptInfo.label !== undefined) {
-					msg += ` with the label "${promptInfo.label}"`;
+				if (promptOptions.title !== undefined && promptOptions.subtitle !== undefined) {
+					msg += ` with the title "${promptOptions.title}" and the subtitle "${promptOptions.subtitle}"`;
+				} else if (promptOptions.title !== undefined) {
+					msg += ` with the title "${promptOptions.title}"`;
+				} else if (promptOptions.subtitle !== undefined) {
+					msg += ` with the subtitle "${promptOptions.subtitle}"`;
 				}
 
 				// Display the message

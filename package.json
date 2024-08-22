@@ -1,6 +1,6 @@
 {
   "name": "@jarboer/electron-prompt",
-  "version": "2.2.0",
+  "version": "2.3.0",
   "description": "Electron helper to prompt for a value via input or select",
   "packageManager": "pnpm@9.0.0",
   "keywords": [
@@ -8,11 +8,18 @@
     "prompt",
     "string"
   ],
-  "author": {
-    "name": "Jarrett",
-    "email": "serve-harrows-0k@icloud.com",
-    "url": "https://github.com/Jarboer"
-  },
+  "authors": [
+    {
+      "name": "Jarrett",
+      "email": "serve-harrows-0k@icloud.com",
+      "url": "https://github.com/Jarboer"
+    },
+    {
+      "name": "p-sam",
+      "email": "p-sam@users.noreply.github.com",
+      "url": "https://github.com/p-sam"
+    }
+  ],
   "repository": {
     "type": "git",
     "url": "https://github.com/Jarboer/electron-prompt.git"
